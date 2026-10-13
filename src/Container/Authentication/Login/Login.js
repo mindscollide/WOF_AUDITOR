@@ -1,0 +1,206 @@
+import React, { useRef, useState, useEffect } from "react";
+import styles from "./style.module.css";
+import { Input, Typography, Row, Col } from "antd";
+import { UserOutlined } from "@ant-design/icons";
+import { Button, Loader, Notification, MaxWidthContainer } from "../../../Components/Elements";
+import { useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { signIn } from "../../../store/actions/auth-actions";
+import Helper from "../../../Common/Functions/history_logout";
+const Login = () => {
+  const auth = useSelector((state) => state.auth);
+  const ui = useSelector((state) => state.ui);
+  const UserIDInput = useRef(null);
+  const dispatch = useDispatch();
+  const { Title } = Typography;
+  const navigate = useNavigate();
+  Helper.navigate = navigate;
+  const [credentials, setCredentials] = useState({
+    UserName: "",
+    Password: "",
+    fakePassword: "",
+  });
+  const [open, setOpen] = useState({
+    open: false,
+    message: "",
+  });
+  const setCredentialHandler = (e) => {
+    if (e.target.name === "Password") {
+      let numChars = e.target.value;
+      let showText = "";
+      for (let i = 0; i < numChars.length; i++) {
+        showText += "•";
+      }
+      setCredentials({
+        ...credentials,
+        [e.target.name]: e.target.value,
+        ["fakePassword"]: showText,
+      });
+    } else {
+      setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    }
+  };
+
+  const validateHandler = (e) => {
+    if (credentials.UserName === "" || credentials.Password === "") {
+      setOpen({
+        ...open,
+        open: true,
+        message: "Please Enter All Credentials",
+      });
+    } else {
+      e.preventDefault();
+      dispatch(signIn(credentials, navigate));
+    }
+  };
+
+
+  useEffect(() => {
+    Helper.navigate = navigate;
+    document.body.className = "login-page";
+    return () => {
+      document.body.className = "";
+    };
+  }, [credentials]);
+  useEffect(() => {
+    if (ui.SomeThingWentWrong === true) {
+      console.log("somthing", ui.SomeThingWentWrong);
+      setOpen({
+        ...open,
+        open: true,
+        message:
+          "Unable to connect to server please check your connection or contact support",
+      });
+    }
+  }, [ui.SomeThingWentWrong]);
+  useEffect(() => {
+    if (UserIDInput.current) {
+      UserIDInput.current.focus();
+    }
+  }, [UserIDInput]);
+  useEffect(() => {
+    // console.log(ui.SessionExpeireResponseMessage);
+    if (
+      auth.SessionExpeireResponseMessage !== "" &&
+      auth.SessionExpeireResponseMessage !== undefined
+    ) {
+      console.log("hi", ui.SessionExpeireResponseMessage);
+      setOpen({
+        ...open,
+        open: true,
+        message: auth.SessionExpeireResponseMessage,
+      });
+    } else {
+      setOpen({
+        ...open,
+        open: false,
+        message: "",
+      });
+    }
+  }, [auth.SessionExpeireResponseMessage]);
+
+  return (
+    <MaxWidthContainer>
+        <form
+          autoComplete="off"
+          onSubmit={(e) => validateHandler(e)}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              height: "100vh"
+            }}>
+            <Row gutter={40} style={{
+              width: "calc(100% + 40px)"
+            }}>
+              <Col lg={12} md={12} sm={24}></Col>
+              <Col lg={12} md={12} sm={24} align="right">
+                <div className={styles.loginBody}>
+                  <Title
+                    level={3}
+                    style={{
+                      color: "white",
+                      textAlign: "center",
+                      marginTop: 10,
+                    }}
+                  >
+                    Write Off Data Capturing Portal
+                  </Title>
+                  <div style={{ marginTop: "6%" }} />
+                  <Title
+                    level={5}
+                    style={{ color: "white", textAlign: "left" }}
+                  >
+                    User ID
+                  </Title>
+
+                  <Input
+                    name="UserName"
+                    size="large"
+                    placeholder="User ID"
+                    prefix={<UserOutlined />}
+                    onChange={setCredentialHandler}
+                    value={credentials.UserName}
+                    ref={UserIDInput}
+                    autoComplete="off"
+                  />
+                  <div style={{ marginTop: "5%" }} />
+                  <Title
+                    level={5}
+                    style={{ color: "white", textAlign: "left" }}
+                  >
+                    Password
+                  </Title>
+                  <Input
+                    name="Password"
+                    size="large"
+                    placeholder="password"
+                    onChange={setCredentialHandler}
+                    // value={credentials.fakePassword}
+                    autoComplete="off"
+                    style={{
+                      fontFamily: "text-security-disc",
+                      WebkitTextSecurity: "disc",
+                      inputSecurity: "none",
+                    }}
+                    type="text"
+                  />
+
+                  {!auth.isLoggedIn && auth.ResponseMessage !== "" ? (
+                    <div align="center">
+                      <div className={styles.error + " " + styles.fade}>
+                        {auth.ResponseMessage}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div style={{ marginTop: "10%" }} />
+                  <div
+                    align="center"
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-evenly"
+                    }}>
+                    <Button
+                      applyClass="btnBorderStyled"
+                      text="Login"
+                      endIcon={<i className="icon-login icon-size-one"></i>}
+                      type="submit"
+                    />
+                    {/* <Link to="/Signup">
+                      <Button applyClass="btnBorderStyledRedSignup" text="Signup" />
+                    </Link> */}
+                  </div>
+                </div>
+              </Col>
+            </Row>
+          </div>
+        </form>
+      <Notification setOpen={setOpen} open={open.open} message={open.message} />
+      {auth.Loading ? <Loader /> : null}
+    </MaxWidthContainer>
+  );
+};
+
+export default Login;

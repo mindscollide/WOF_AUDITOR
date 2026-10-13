@@ -1,0 +1,38 @@
+body {
+  background-color: #f6f6f6 !important;
+  margin: 0;
+  font-family: 'Open Sans', sans-serif;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+/* to make disabled input boxes look different (was .MuiInputBase-input.Mui-disabled) */
+.ant-input[disabled],
+.ant-input-disabled {
+  background-color: #f3f3f3 !important;
+  font-size: 0.9rem !important;
+  color: black !important;
+}
+
+.mainContainer {
+  position: relative;
+  padding-left: 15px;
+  padding-right: 20px;
+  min-height: 85vh;
+  margin-top: 60px;
+}
+.crosstick{
+  color: red;
+}
+.ant-menu-submenu-title > .ant-menu-title-content:hover {
+
+  /* display: none!important; */
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
