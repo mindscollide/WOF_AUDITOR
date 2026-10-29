@@ -1,4 +1,5 @@
 // all routing related data like rendering components and their paths sits here in this file
+import { APP_NAME } from "../Common/app-name";
 import {
   SecurityAdminAuditTrail,
   SecurityAdminUserAudit,
@@ -21,7 +22,7 @@ const UserSelection = (token,role)=>{
   let Notification = ''
 
   if(token && role===5){
-    Title ="WOFF Data Centralization & MIS Capturing"
+    Title = APP_NAME
     UserRoleId = role
     SidebarData = AuditorLinks
     MainMenu = AuditorRouteData
